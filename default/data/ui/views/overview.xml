@@ -1,0 +1,74 @@
+<form theme="dark" script="overview.js">
+  <label>overview</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+          `ilog` "Line{@SignatureCode}"!=""
+          | rename Line{@SignatureCode} as sig_code
+          | lookup ilog-sig sig as sig_code
+          | stats count by desc</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <drilldown>
+          <condition field="*">
+            <set token="sig_desc">$row.desc$</set>
+          </condition>
+        </drilldown>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>`ilog` "Line{@SignatureCode}"!=""
+          | rename Line{@SignatureCode} as sig_code
+          | lookup ilog-sig sig as sig_code
+          | stats count by desc
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>$sig_desc$</title>
+      <table depends="$sig_desc$" id="evt">
+        <search>
+          <query>
+          `ilog` "Line{@SignatureCode}"!=""
+          | eval uri=urldecode(urldecode(uri) )
+	  | reverse | join source [ search `ilog` SourceLog{@FileName}!="" | rename SourceLog{@FileName} as log ]
+          | rename Line{@SignatureCode} as sig_code
+          | lookup ilog-sig sig as sig_code
+          | search desc="$sig_desc$"
+          | table _time sig_code src http_referrer http_user_agent status uri source log desc
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <fields>_time sig_code src http_referrer http_user_agent status uri</fields>
+        <drilldown>
+          <condition field="*">
+          </condition>
+        </drilldown>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>
