@@ -52,8 +52,9 @@
         <search>
           <query>
           `ilog` "Line{@SignatureCode}"!=""
+          | eval uri=if(isnull(uri), uri_query, uri)
           | eval uri=urldecode(urldecode(uri) )
-	  | reverse | join source [ search `ilog` SourceLog{@FileName}!="" | rename SourceLog{@FileName} as log ]
+          | reverse | join source [ search `ilog` SourceLog{@FileName}!="" | rename SourceLog{@FileName} as log ]
           | rename Line{@SignatureCode} as sig_code
           | lookup ilog-sig sig as sig_code
           | search desc="$sig_desc$"
