@@ -1,4 +1,4 @@
-<form theme="dark" script="overview.js">
+<form version="1.1" theme="light" script="overview.js">
   <label>overview</label>
   <fieldset submitButton="true" autoRun="true">
     <input type="time" token="field1">
