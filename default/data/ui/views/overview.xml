@@ -16,7 +16,7 @@
           <query>
           `ilog` ("Line{@SignatureCode}"!="" OR "Line{@SameIPCount}"!="") "Line{@No}"!=0
           | rename Line{@SignatureCode} as sig_code Line{@SameIPCount} as same_ip_cnt
-          | lookup ilog-sig sig as sig_code
+          | lookup ilog_sig sig as sig_code
           | eval sig_code=if(isnull(same_ip_cnt), sig_code, same_ip_cnt)
           | eval desc=if(isnull(same_ip_cnt), desc, "Attack from Same IP")
           | stats count by desc</query>
@@ -36,7 +36,7 @@
         <search>
           <query>`ilog` ("Line{@SignatureCode}"!="" OR "Line{@SameIPCount}"!="") "Line{@No}"!=0
           | rename Line{@SignatureCode} as sig_code Line{@SameIPCount} as same_ip_cnt
-          | lookup ilog-sig sig as sig_code
+          | lookup ilog_sig sig as sig_code
           | eval sig_code=if(isnull(same_ip_cnt), sig_code, same_ip_cnt)
           | eval desc=if(isnull(same_ip_cnt), desc, "Attack from Same IP")
           | stats count by desc
@@ -60,7 +60,7 @@
           | eval uri=urldecode(urldecode(uri) )
           | reverse | join source [ search `ilog` SourceLog{@FileName}!="" | rename SourceLog{@FileName} as log ]
           | rename Line{@SignatureCode} as sig_code Line{@SameIPCount} as same_ip_cnt
-          | lookup ilog-sig sig as sig_code
+          | lookup ilog_sig sig as sig_code
           | eval sig_code=if(isnull(same_ip_cnt), sig_code, same_ip_cnt)
           | eval desc=if(isnull(same_ip_cnt), desc, "Attack from Same IP")
           | search desc="$sig_desc$"
